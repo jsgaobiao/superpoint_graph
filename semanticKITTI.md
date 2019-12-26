@@ -49,7 +49,9 @@ CUDA_VISIBLE_DEVICES=0 python ./learning/main.py --dataset skitti --SKITTI_PATH 
 --use_val_set 1 --odir results/skitti/best/train_12
 ```
 
-** ------------------- Attention : untest below ----------------------- **
+------------------- **Attention : untest below** -----------------------
+
+
 Estimate the quality of the semantic segmentation with:
 ```
 python learning/evaluate.py --dataset skitti --odir results/skitti/best --cvfold 123456
