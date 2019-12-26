@@ -64,6 +64,10 @@ def main():
     elif args.dataset == 'vkitti':
         folders = ["01/", "02/","03/", "04/","05/", "06/"]
         n_labels = 13 #number of classes
+    elif args.dataset == 'skitti':
+        # folders = ["00/", "01/", "02/","03/", "04/","05/", "06/", "07/", "08/", "09/", "10/", "90/", "91/", "92/", "93/"]
+        folders = ["08/", "09/", "10/"]
+        n_labels = 19 #number of classes
     elif args.dataset == 'custom_dataset':
         folders = ["train/", "test/"]
         n_labels = 10 #number of classes
@@ -90,6 +94,8 @@ def main():
             files = glob.glob(data_folder + "*.txt")
         elif args.dataset == 'vkitti':
             files = glob.glob(data_folder + "*.npy")
+        elif args.dataset == 'skitti':
+            files = glob.glob(data_folder + "*.bin")
             
         if (len(files) == 0):
             continue
@@ -108,6 +114,10 @@ def main():
                 str_file    = str_folder + file_name_short + '.h5'
             elif args.dataset=='vkitti':
                 data_file   = data_folder + file_name + ".npy"
+                str_file    = str_folder  + file_name + '.h5'
+            elif args.dataset=='skitti':
+                data_file   = data_folder + file_name + ".bin"
+                label_file = data_folder + file_name + ".label"
                 str_file    = str_folder  + file_name + '.h5'
             i_file = i_file + 1
             print(str(i_file) + " / " + str(n_files) + "---> "+file_name)
@@ -140,6 +150,10 @@ def main():
                     xyz, rgb, labels = read_vkitti_format(data_file)
                     if pruning:
                         xyz, rgb, labels, o = libply_c.prune(xyz.astype('f4'), args.voxel_width, rgb.astype('uint8'), labels.astype('uint8'), np.zeros(1, dtype='uint8'), n_labels, 0)
+                elif args.dataset == 'skitti':
+                    xyz, rgb, labels = read_skitti_format(data_file, label_file, root)
+                    if pruning:
+                        xyz, rgb, labels, o = libply_c.prune(xyz.astype('f4'), args.voxel_width, rgb.astype('uint8'), labels.astype('uint8'), np.zeros(1, dtype='uint8'), n_labels, 0)
                     #---compute nn graph-------
                 n_ver = xyz.shape[0]    
                 print("computing NN structure")
@@ -167,6 +181,10 @@ def main():
                     #we define the objects as the constant connected components of the labels
                     hard_labels = np.argmax(labels, 1)
                     is_transition = hard_labels[graph_nn["source"]]!=hard_labels[graph_nn["target"]]
+                elif args.dataset=='skitti':
+                    #we define the objects as the constant connected components of the labels
+                    hard_labels = np.argmax(labels, 1)
+                    is_transition = hard_labels[graph_nn["source"]]!=hard_labels[graph_nn["target"]]
                     
                     dump, objects = libply_c.connected_comp(n_ver \
                        , graph_nn["source"].astype('uint32'), graph_nn["target"].astype('uint32') \
@@ -179,7 +197,10 @@ def main():
                     geof = 0
                 
                 if args.plane_model: #use a simple palne model to the compute elevation
-                    low_points = ((xyz[:,2]-xyz[:,2].min() < 0.5)).nonzero()[0]
+                    # print(xyz[np.argpartition(xyz[:,2], 200)[:200], 2])
+                    low_points = np.argpartition(xyz[:,2], 200)[:200] # To avoid the influence of noise point
+                    # low_points = ((xyz[:,2]-xyz[:,2].min() < 0.5)).nonzero()[0]
+                    # print('low_points : {0}/{1}'.format(low_points.shape, xyz.shape))
                     reg = RANSACRegressor(random_state=0).fit(xyz[low_points,:2], xyz[low_points,2])
                     elevation = xyz[:,2]-reg.predict(xyz[:,:2])
                 else:
@@ -266,6 +287,14 @@ def get_vkitti_info(args):
         'classes': 13,
         'inv_class_map': {0:'Terrain', 1:'Tree', 2:'Vegetation', 3:'Building', 4:'Road', 5:'GuardRail', 6:'TrafficSign', 7:'TrafficLight', 8:'Pole', 9:'Misc', 10:'Truck', 11:'Car', 12:'Van', 13:'None'},
     }
+
+def get_skitti_info(args):
+    #for now, no edge attributes
+    return {
+        'classes': 19,
+        'inv_class_map': {0:'unlabeled', 1:'car', 2:'bicycle', 3:'motorcycle', 4:'truck', 5:'other-vehicle', 6:'person', 7:'bicyclist', 8:'motorcyclist', 9:'road', 10:'parking', 11:'sidewalk', 12:'other-ground', \
+            13:'building', 14:'fence', 15:'vegetation', 16:'trunk', 17:'terrain', 18:'pole', 19:'traffic-sign'},
+    }
     
     
                 
@@ -300,6 +329,27 @@ def create_vkitti_datasets(args, test_seed_offset=0):
                 if fname.endswith(".h5"):
                     trainlist.append(path+fname)
     path = '{}/features_supervision/0{:d}/'.format(args.ROOT_PATH, args.cvfold)
+    for fname in sorted(os.listdir(path)):
+        if fname.endswith(".h5"):
+            testlist.append(path+fname)
+           
+    return tnt.dataset.ListDataset(trainlist,
+                                   functools.partial(graph_loader, train=True, args=args, db_path=args.ROOT_PATH)), \
+           tnt.dataset.ListDataset(testlist,
+                                   functools.partial(graph_loader, train=False, args=args, db_path=args.ROOT_PATH))
+
+def create_skitti_datasets(args, test_seed_offset=0):
+    """ Gets training and test datasets. """
+    # Load formatted clouds
+    testlist, trainlist = [], []
+    data_set_list = [0,1,2,3,4,5,6,7,90,91,92,93]
+    for n in data_set_list:
+        if n != args.cvfold:
+            path = '{}/features_supervision/{:0>2d}/'.format(args.ROOT_PATH, n)
+            for fname in sorted(os.listdir(path)):
+                if fname.endswith(".h5"):
+                    trainlist.append(path+fname)
+    path = '{}/features_supervision/{:0>2d}/'.format(args.ROOT_PATH, args.cvfold)
     for fname in sorted(os.listdir(path)):
         if fname.endswith(".h5"):
             testlist.append(path+fname)

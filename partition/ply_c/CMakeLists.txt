@@ -18,12 +18,15 @@ find_package(PythonInterp)
 find_package(NumPy 1.5 REQUIRED)
 
 find_package(Boost 1.65.0 COMPONENTS graph REQUIRED) #system filesystem thread serialization
-if (${Boost_MINOR_VERSION} LESS 67 )
-    find_package(Boost 1.65.0 COMPONENTS numpy${PYTHON_VERSION_MAJOR} REQUIRED) #system filesystem thread serialization
-else()
-    set(PYTHONVERSION ${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-    find_package(Boost 1.67.0 COMPONENTS numpy${PYTHONVERSION} REQUIRED)
-endif()
+set(Boost_INCLUDE_DIRS /home/gaobiao/anaconda3/envs/spg/include/boost)
+set(Boost_LIBRARY_DIRS /home/gaobiao/anaconda3/envs/spg/lib)
+set(Boost_LIBRARIES /home/gaobiao/anaconda3/envs/spg/lib/libboost_numpy37.so)
+#if (${Boost_MINOR_VERSION} LESS 67 )
+#    find_package(Boost 1.65.0 COMPONENTS numpy${PYTHON_VERSION_MAJOR} REQUIRED) #system filesystem thread serialization
+#else()
+#    set(PYTHONVERSION ${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
+#    find_package(Boost 1.67.0 COMPONENTS numpy${PYTHONVERSION} REQUIRED)
+#endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})

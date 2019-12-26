@@ -75,6 +75,8 @@ def get_num_classes(args):
         dbinfo = graph_processing.get_sema3d_info(args)
     elif args.dataset == 'vkitti':
         dbinfo = graph_processing.get_vkitti_info(args)
+    elif args.dataset == 'skitti':
+        dbinfo = graph_processing.get_skitti_info(args)
     else:
         raise NotImplementedError('Unknown dataset ' + args.dataset)
     return dbinfo["classes"]

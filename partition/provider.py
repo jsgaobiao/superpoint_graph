@@ -208,6 +208,22 @@ def read_vkitti_format(raw_path):
     labels = data[:, -1]+1
     labels[(labels==14).nonzero()] = 0
     return xyz, rgb, labels
+def read_skitti_format(raw_path, label_path, root_path):
+    """extract data from a room folder"""
+    label_map = {0 : 0,1 : 0, 10: 1,11: 2,13: 5,15: 3,16: 5,18: 4,20: 5,  30: 6,  31: 7,32: 8, 40: 9,44: 10,48: 11, 49: 12, 50: 13, 51: 14, \
+         52: 0,  60: 9,  70: 15, 71: 16, 72: 17, 80: 18, 81: 19, 99: 0,  252: 1,  253: 7, 254: 6, 255: 8, 256: 5, 257: 5,  258: 4, 259: 5 }
+    data = np.fromfile(os.path.join(root_path, os.readlink(raw_path)), dtype=np.float32)
+    data = data.reshape(-1, 4)
+    # print(data.shape)
+    xyz = data[:, 0:3]
+    rgb = np.zeros((data.shape[0], 3))
+    labels = np.fromfile(os.path.join(root_path, os.readlink(label_path)), dtype=np.uint32)
+    for i in range(len(labels)):
+        labels[i] = label_map[labels[i] & 0xFFFF]
+    # print(xyz.shape, rgb.shape, labels.shape)
+    # print(xyz[0], rgb[0], labels[0])
+    return xyz, rgb, labels
+    
 #------------------------------------------------------------------------------
 def object_name_to_label(object_class):
     """convert from object name in S3DIS to an int"""

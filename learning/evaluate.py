@@ -35,6 +35,11 @@ elif args.dataset == 'vkitti':
     n_labels = 13
     inv_class_map = {0:'Terrain', 1:'Tree', 2:'Vegetation', 3:'Building', 4:'Road', 5:'GuardRail', 6:'TrafficSign', 7:'TrafficLight', 8:'Pole', 9:'Misc', 10:'Truck', 11:'Car', 12:'Van'}
     base_name = args.odir+'/cv'
+elif args.dataset == 'skitti':
+    n_labels = 19
+    inv_class_map = {0:'unlabeled', 1:'car', 2:'bicycle', 3:'motorcycle', 4:'truck', 5:'other-vehicle', 6:'person', 7:'bicyclist', 8:'motorcyclist', 9:'road', 10:'parking', 11:'sidewalk', 12:'other-ground', \
+            13:'building', 14:'fence', 15:'vegetation', 16:'trunk', 17:'terrain', 18:'pole', 19:'traffic-sign'}
+    base_name = args.odir+'/cv'
     
 C = ConfusionMatrix(n_labels)
 C.confusion_matrix=np.zeros((n_labels, n_labels))

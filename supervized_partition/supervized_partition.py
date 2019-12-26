@@ -57,7 +57,7 @@ from folderhierarchy import FolderHierachy
 def parse_args():
     parser = argparse.ArgumentParser(description='Large-scale Point Cloud Semantic Segmentation with Superpoint Graphs')
     # Dataset
-    parser.add_argument('--dataset', default='s3dis', help='Dataset name: sema3d|s3dis|vkitti')
+    parser.add_argument('--dataset', default='s3dis', help='Dataset name: sema3d|s3dis|vkitti|skitti')
     parser.add_argument('--cvfold', default=1, type=int, help='Fold left-out for testing in leave-one-out setting (S3DIS)')
     parser.add_argument('--resume', default='', help='Loads a previously saved model.')
     parser.add_argument('--db_train_name', default='trainval', help='Training set (Sema3D)')
@@ -145,6 +145,9 @@ def dataset(args):
     elif args.dataset=='vkitti':
         dbinfo = get_vkitti_info(args)
         create_dataset = create_vkitti_datasets
+    elif args.dataset=='skitti':
+        dbinfo = get_skitti_info(args)
+        create_dataset = create_skitti_datasets
     else:
         raise NotImplementedError('Unknown dataset ' + args.dataset)
     return dbinfo, create_dataset
