@@ -35,6 +35,9 @@ from learning import spg
 from learning import graphnet
 from learning import pointnet
 from learning import metrics
+import warnings
+
+warnings.filterwarnings("ignore")
 
 def main():
     parser = argparse.ArgumentParser(description='Large-scale Point Cloud Semantic Segmentation with Superpoint Graphs')
