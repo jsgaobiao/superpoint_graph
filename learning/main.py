@@ -59,7 +59,7 @@ def main():
     parser.add_argument('--nworkers', default=0, type=int, help='Num subprocesses to use for data loading. 0 means that the data will be loaded in the main process')
     parser.add_argument('--test_nth_epoch', default=1, type=int, help='Test each n-th epoch during training')
     parser.add_argument('--save_nth_epoch', default=1, type=int, help='Save model each n-th epoch during training')
-    parser.add_argument('--test_multisamp_n', default=10, type=int, help='Average logits obtained over runs with different seeds')
+    parser.add_argument('--test_multisamp_n', default=1, type=int, help='Average logits obtained over runs with different seeds')
 
     # Dataset
     parser.add_argument('--dataset', default='sema3d', help='Dataset name: sema3d|s3dis')
@@ -374,15 +374,18 @@ def main():
                        os.path.join(args.odir, 'model.pth.tar'))
     
     # Final evaluation
+    print('Final evaluation')
     if args.test_multisamp_n>0 and 'test' in args.db_test_name:
         acc_test, oacc_test, avg_iou_test, per_class_iou_test, predictions_test, avg_acc_test, confusion_matrix = eval_final()
         print('-> Multisample {}: Test accuracy: {}, \tTest oAcc: {}, \tTest avgIoU: {}, \tTest mAcc: {}'.format(args.test_multisamp_n, acc_test, oacc_test, avg_iou_test, avg_acc_test))
         with h5py.File(os.path.join(args.odir, 'predictions_'+args.db_test_name+'.h5'), 'w') as hf:
             for fname, o_cpu in predictions_test.items():
                 hf.create_dataset(name=fname, data=o_cpu) #(0-based classes)
+        print('Writing to {}'.format(os.path.join(args.odir, 'scores_'+args.db_test_name+'.json')))
         with open(os.path.join(args.odir, 'scores_'+args.db_test_name+'.json'), 'w') as outfile:
             json.dump([{'epoch': args.start_epoch, 'acc_test': acc_test, 'oacc_test': oacc_test, 'avg_iou_test': avg_iou_test, 'per_class_iou_test': per_class_iou_test, 'avg_acc_test': avg_acc_test}], outfile)
         np.save(os.path.join(args.odir, 'pointwise_cm.npy'), confusion_matrix)
+        print('Writing to {}'.format(os.path.join(args.odir, 'pointwise_cm.npy')))
 
 def resume(args, dbinfo):
     """ Loads model and optimizer state from a previous checkpoint. """

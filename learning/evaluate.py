@@ -36,25 +36,34 @@ elif args.dataset == 'vkitti':
     inv_class_map = {0:'Terrain', 1:'Tree', 2:'Vegetation', 3:'Building', 4:'Road', 5:'GuardRail', 6:'TrafficSign', 7:'TrafficLight', 8:'Pole', 9:'Misc', 10:'Truck', 11:'Car', 12:'Van'}
     base_name = args.odir+'/cv'
 elif args.dataset == 'skitti':
-    n_labels = 19
+    n_labels = 20
     inv_class_map = {0:'unlabeled', 1:'car', 2:'bicycle', 3:'motorcycle', 4:'truck', 5:'other-vehicle', 6:'person', 7:'bicyclist', 8:'motorcyclist', 9:'road', 10:'parking', 11:'sidewalk', 12:'other-ground', \
             13:'building', 14:'fence', 15:'vegetation', 16:'trunk', 17:'terrain', 18:'pole', 19:'traffic-sign'}
-    base_name = args.odir+'/cv'
+    base_name = args.odir+'/train_12'
     
 C = ConfusionMatrix(n_labels)
 C.confusion_matrix=np.zeros((n_labels, n_labels))
 
 
-for i_fold in range(len(args.cvfold)):
-    fold = int(args.cvfold[i_fold])
-    cm = ConfusionMatrix(n_labels)
-    cm.confusion_matrix=np.load(base_name+str(fold) +'/pointwise_cm.npy')
-    print("Fold %d : \t OA = %3.2f \t mA = %3.2f \t mIoU = %3.2f" % (fold, \
-        100 * ConfusionMatrix.get_overall_accuracy(cm) \
-      , 100 * ConfusionMatrix.get_mean_class_accuracy(cm) \
-      , 100 * ConfusionMatrix.get_average_intersection_union(cm)
-      ))
-    C.confusion_matrix += cm.confusion_matrix
+# for i_fold in range(len(args.cvfold)):
+#     fold = int(args.cvfold[i_fold])
+#     cm = ConfusionMatrix(n_labels)
+#     cm.confusion_matrix=np.load(base_name+str(fold) +'/pointwise_cm.npy')
+#     print("Fold %d : \t OA = %3.2f \t mA = %3.2f \t mIoU = %3.2f" % (fold, \
+#         100 * ConfusionMatrix.get_overall_accuracy(cm) \
+#       , 100 * ConfusionMatrix.get_mean_class_accuracy(cm) \
+#       , 100 * ConfusionMatrix.get_average_intersection_union(cm)
+#       ))
+#     C.confusion_matrix += cm.confusion_matrix
+
+cm = ConfusionMatrix(n_labels)
+cm.confusion_matrix=np.load(base_name +'/pointwise_cm.npy')
+print("OA = %3.2f \t mA = %3.2f \t mIoU = %3.2f" % ( \
+    100 * ConfusionMatrix.get_overall_accuracy(cm) \
+    , 100 * ConfusionMatrix.get_mean_class_accuracy(cm) \
+    , 100 * ConfusionMatrix.get_average_intersection_union(cm)
+    ))
+C.confusion_matrix += cm.confusion_matrix
     
 print("\nOverall accuracy : %3.2f %%" % (100 * (ConfusionMatrix.get_overall_accuracy(C))))
 print("Mean accuracy    : %3.2f %%" % (100 * (ConfusionMatrix.get_mean_class_accuracy(C))))

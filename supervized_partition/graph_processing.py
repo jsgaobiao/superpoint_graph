@@ -67,7 +67,7 @@ def main():
     elif args.dataset == 'skitti':
         # folders = ["00/", "01/", "02/","03/", "04/","05/", "06/", "07/", "08/", "09/", "10/", "90/", "91/", "92/", "93/"]
         folders = ["08/", "09/", "10/"]
-        n_labels = 19 #number of classes
+        n_labels = 20 #number of classes
     elif args.dataset == 'custom_dataset':
         folders = ["train/", "test/"]
         n_labels = 10 #number of classes
@@ -291,7 +291,7 @@ def get_vkitti_info(args):
 def get_skitti_info(args):
     #for now, no edge attributes
     return {
-        'classes': 19,
+        'classes': 20,
         'inv_class_map': {0:'unlabeled', 1:'car', 2:'bicycle', 3:'motorcycle', 4:'truck', 5:'other-vehicle', 6:'person', 7:'bicyclist', 8:'motorcyclist', 9:'road', 10:'parking', 11:'sidewalk', 12:'other-ground', \
             13:'building', 14:'fence', 15:'vegetation', 16:'trunk', 17:'terrain', 18:'pole', 19:'traffic-sign'},
     }

@@ -14,6 +14,9 @@ class ConfusionMatrix:
     self.confusion_matrix[ground_truth][predicted] += number_of_added_elements
 
   def count_predicted_batch(self, ground_truth_vec, predicted): # added
+    # print("ground_truth_vec:{0}  confusion_matrix:{1}  predicted:{2}".format(ground_truth_vec.shape, self.confusion_matrix.shape, predicted.shape))
+    if ground_truth_vec.shape[1] == 19:
+        ground_truth_vec = np.concatenate((np.zeros((ground_truth_vec.shape[0], 1)), ground_truth_vec), axis=1)
     for i in range(ground_truth_vec.shape[0]):
       self.confusion_matrix[:,predicted[i]] += ground_truth_vec[i,:]
      

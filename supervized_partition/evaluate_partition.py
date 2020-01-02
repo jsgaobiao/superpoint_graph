@@ -46,7 +46,7 @@ elif args.dataset == 'vkitti':
 elif args.dataset == 'skitti':
     fold_size = [4541,1101,4661,801,271,2761,1101,1101,4071,1591,1201,2042,4084,2527,878]
     # files = glob.glob(root + 'cv{}'.format(int(args.cvfold[0])) + '/res*.h5')
-    n_classes = 19
+    n_classes = 20
 
 file_result_txt = open(args.odir + args.folder + '/results' + '.txt',"w")
 file_result_txt.write("   N \t ASA \t BR \t BP\n")

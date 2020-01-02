@@ -84,7 +84,7 @@ def get_info(args):
         else:
             edge_feats += 1
     if args.loss_weights == 'none':
-        weights = np.ones((19,),dtype='f4')
+        weights = np.ones((20,),dtype='f4')
     else:
         weights = h5py.File(args.SKITTI_PATH + "/parsed/class_count.h5")["class_count"][:].astype('f4')
         weights = weights[:,[i for i in range(6) if i != args.cvfold-1]].sum(1)
@@ -95,7 +95,7 @@ def get_info(args):
     return {
         'node_feats': 9 if args.pc_attribs=='' else len(args.pc_attribs),
         'edge_feats': edge_feats,
-        'classes': 19,
+        'classes': 20,
         'class_weights': weights,
         'inv_class_map': {0:'unlabeled', 1:'car', 2:'bicycle', 3:'motorcycle', 4:'truck', 5:'other-vehicle', 6:'person', 7:'bicyclist', 8:'motorcyclist', 9:'road', 10:'parking', 11:'sidewalk', 12:'other-ground', \
             13:'building', 14:'fence', 15:'vegetation', 16:'trunk', 17:'terrain', 18:'pole', 19:'traffic-sign'},
@@ -103,7 +103,7 @@ def get_info(args):
 
 def preprocess_pointclouds(SKITTI_PATH):
     """ Preprocesses data by splitting them by components and normalizing."""
-    class_count = np.zeros((19,15),dtype='int')
+    class_count = np.zeros((20,15),dtype='int')
     data_set_list = [0,1,2,3,4,5,6,7,8,9,10,90,91,92,93]
     class_n = 0
     for n in data_set_list:
@@ -125,7 +125,7 @@ def preprocess_pointclouds(SKITTI_PATH):
                 
                 labels = f['labels'][:]
                 hard_labels = np.argmax(labels[:,1:],1)
-                label_count = np.bincount(hard_labels, minlength=19)
+                label_count = np.bincount(hard_labels, minlength=20)
                 class_count[:,class_n] = class_count[:,class_n] + label_count
                 
                 e = (f['xyz'][:,2][:] -  np.min(f['xyz'][:,2]))/ (np.max(f['xyz'][:,2]) -  np.min(f['xyz'][:,2]))-0.5
