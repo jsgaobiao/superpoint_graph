@@ -39,7 +39,7 @@ elif args.dataset == 'skitti':
     n_labels = 20
     inv_class_map = {0:'unlabeled', 1:'car', 2:'bicycle', 3:'motorcycle', 4:'truck', 5:'other-vehicle', 6:'person', 7:'bicyclist', 8:'motorcyclist', 9:'road', 10:'parking', 11:'sidewalk', 12:'other-ground', \
             13:'building', 14:'fence', 15:'vegetation', 16:'trunk', 17:'terrain', 18:'pole', 19:'traffic-sign'}
-    base_name = args.odir+'/train_12'
+    base_name = args.odir+'/train_12test'
     
 C = ConfusionMatrix(n_labels)
 C.confusion_matrix=np.zeros((n_labels, n_labels))
@@ -71,3 +71,4 @@ print("Mean IoU         : %3.2f %%\n" % (100 * (ConfusionMatrix.get_average_inte
 print("         Classe :   IoU")
 for c in range(0,n_labels):
     print ("   %12s : %6.2f %% \t %.1e points" %(inv_class_map[c],100*ConfusionMatrix.get_intersection_union_per_class(C)[c], ConfusionMatrix.count_gt(C,c)))
+np.savetxt('train12_eval.result', C.confusion_matrix, fmt='%.0f\t')

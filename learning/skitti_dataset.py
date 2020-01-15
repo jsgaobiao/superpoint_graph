@@ -54,7 +54,7 @@ def get_datasets(args, test_seed_offset=0):
             if fname.endswith(".h5"):
                 validlist.append(spg.spg_reader(args, path + fname, True))
     # test
-    test_set_list = [8, 9, 10]
+    test_set_list = [10]
     for n in test_set_list:
         path = '{}/superpoint_graphs/{:0>2d}/'.format(args.SKITTI_PATH, n)
         #test set

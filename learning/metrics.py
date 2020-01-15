@@ -17,8 +17,11 @@ class ConfusionMatrix:
     # print("ground_truth_vec:{0}  confusion_matrix:{1}  predicted:{2}".format(ground_truth_vec.shape, self.confusion_matrix.shape, predicted.shape))
     if ground_truth_vec.shape[1] == 19:
         ground_truth_vec = np.concatenate((np.zeros((ground_truth_vec.shape[0], 1)), ground_truth_vec), axis=1)
-    for i in range(ground_truth_vec.shape[0]):
-      self.confusion_matrix[:,predicted[i]] += ground_truth_vec[i,:]
+        for i in range(ground_truth_vec.shape[0]):
+          self.confusion_matrix[:,predicted[i]+1] += ground_truth_vec[i,:]
+    else:
+        for i in range(ground_truth_vec.shape[0]):
+          self.confusion_matrix[:,predicted[i]] += ground_truth_vec[i,:]
      
   def count_predicted_batch_hard(self, ground_truth_vec, predicted): # added
     for i in range(ground_truth_vec.shape[0]):
