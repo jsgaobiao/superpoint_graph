@@ -1,0 +1,9 @@
+results_part
+results
+*.out
+*.result
+*.pyc
+*DS_Store*
+*.vscode
+*.so
+partition/ply_c/build
